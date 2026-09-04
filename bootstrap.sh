@@ -13,8 +13,8 @@ sudo apt-get update
 sudo apt-get install -y ufw
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
-# LAN-only SSH -- adjust the CIDR to your actual home network range.
-sudo ufw allow from 192.168.0.0/16 to any port 22 proto tcp
+# LAN-only SSH, scoped to the actual home network range (192.168.4.29/22).
+sudo ufw allow from 192.168.4.0/22 to any port 22 proto tcp
 # Trust the tailscale0 interface -- only devices authenticated to the
 # tailnet can reach it at all, so this is how remote admin SSH and
 # internal-only tools (e.g. Syncthing) get reached off-LAN.
@@ -49,7 +49,8 @@ cat <<'EOF'
      cloudflared tunnel route dns home-server farsi-transcriber.jonahsaidian.com
      cloudflared tunnel route dns home-server photos.jonahsaidian.com
 
-4. Copy .env.example to .env and fill in OPENAI_API_KEY.
+4. Master .env (OPENAI_API_KEY, GITHUB_PAT, TAILSCALE_AUTHKEY) should
+   already exist at this point -- see SETUP.md step 2.
 
 5. Install a GitHub Actions self-hosted runner for this repo:
      https://github.com/<your-username>/home-server-infra/settings/actions/runners/new
