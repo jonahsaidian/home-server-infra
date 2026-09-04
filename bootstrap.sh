@@ -15,12 +15,19 @@ sudo ufw default deny incoming
 sudo ufw default allow outgoing
 # LAN-only SSH -- adjust the CIDR to your actual home network range.
 sudo ufw allow from 192.168.0.0/16 to any port 22 proto tcp
+# Trust the tailscale0 interface -- only devices authenticated to the
+# tailnet can reach it at all, so this is how remote admin SSH and
+# internal-only tools (e.g. Syncthing) get reached off-LAN.
+sudo ufw allow in on tailscale0
 sudo ufw --force enable
 
 echo "==> Creating shared 'edge' Docker network"
 echo "    (used by cloudflared here and by immich-server in immich-infra"
 echo "    so the tunnel can reach both stacks)"
-docker network create edge || true
+# usermod -aG docker above doesn't take effect in this same shell/script --
+# sg docker runs the command in a subshell with the new group active
+# without needing a fresh login.
+sg docker -c "docker network create edge" || true
 
 cat <<'EOF'
 
