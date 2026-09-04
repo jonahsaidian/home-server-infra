@@ -1,0 +1,10 @@
+
+tunnel: home-server
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: farsi-transcriber.jonahsaidian.com
+    service: http://farsi-transcriber:8501
+  - hostname: photos.jonahsaidian.com
+    service: http://immich-server:2283
+  - service: http_status:404

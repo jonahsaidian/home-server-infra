@@ -1,0 +1,31 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./cloudflared/config.yml:/etc/cloudflared/config.yml:ro
+      - ./cloudflared/credentials.json:/etc/cloudflared/credentials.json:ro
+    networks:
+      - default
+      - edge
+    restart: unless-stopped
+
+  farsi-transcriber:
+    image: ghcr.io/jonahsaidian/farsitotext:latest
+    env_file:
+      - .env
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+  # app2:
+  #   image: ghcr.io/jonahsaidian/app2:latest
+  #   env_file:
+  #     - .env
+  #   expose:
+  #     - "8502"
+  #   restart: unless-stopped
+
+networks:
+  edge:
+    external: true
