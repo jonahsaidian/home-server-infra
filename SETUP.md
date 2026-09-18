@@ -46,8 +46,13 @@ Status legend:
      GitHub Actions runner registration token at run time (registration
      tokens expire in ~1 hour, so they can't be pre-supplied).
    - `TAILSCALE_AUTHKEY` -- for non-interactive `tailscale up`.
-   - `OPENAI_API_KEY` -- consumed by `farsi-transcriber` (see
-     `.env.example`).
+   - `OPENAI_API_KEY` -- **leave this blank.** `farsi-transcriber` is a
+     public app whose UI pre-fills this field from the environment for
+     every visitor (`ui/app.py`'s "Auto API Key" convenience feature) --
+     setting a real key here would let anyone hitting the public URL
+     transcribe on your account, charged to you. Leaving it unset forces
+     each visitor to paste in their own key, which is the intended
+     public-deployment mode.
    Copy it from your local machine with `scp`, or create it directly on
    the server -- either way this is a manual, one-time step.
 5. Create `immich-infra`'s own `.env` there (`JWT_SECRET`, `DB_PASSWORD`,
