@@ -51,8 +51,9 @@ Status legend:
      prompt, not from a file.
    - Runner registration is manual for now; PAT-based auto-registration
      remains a `setup.sh` TODO, also without a master `.env`.
-5. Create `immich-infra`'s own `.env` there (`JWT_SECRET`, `DB_PASSWORD`,
-   etc.). See that repo's docs.
+5. Create `immich-infra`'s own `.env` there (see that repo's
+   `.env.example`: `IMMICH_VERSION` pin, `UPLOAD_LOCATION`, DB credentials,
+   `DB_DATA_LOCATION`, `DB_HOSTNAME`).
 
 ## 3. Storage discovery (manual, 1 minute)
 
@@ -160,7 +161,7 @@ set -euo pipefail
 BACKUP_DIR="/mnt/<drive-label>/backups/immich"
 mkdir -p "$BACKUP_DIR"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-docker exec immich_postgres pg_dump -U postgres -d immich -Fc \
+docker exec immich-infra-postgres-1 pg_dump -U immich -d immich -Fc \
   > "$BACKUP_DIR/immich-$TIMESTAMP.dump"
 find "$BACKUP_DIR" -name 'immich-*.dump' -mtime +14 -delete
 ```
@@ -170,7 +171,7 @@ Writes to the external drive (outside any git repo), keeps 14 days,
 fires on next boot. No DB password needed in the script -- `pg_dump` runs
 inside the Postgres container via `docker exec`, using local trust auth.
 
-Restore: `docker exec -i immich_postgres pg_restore -U postgres -d immich
+Restore: `docker exec -i immich-infra-postgres-1 pg_restore -U immich -d immich
 --clean < immich-<timestamp>.dump`, after the stack is up but before
 first use.
 

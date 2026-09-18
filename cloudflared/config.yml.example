@@ -1,5 +1,8 @@
 
-tunnel: home-server
+# Tunnel UUID from `cloudflared tunnel create` (SETUP.md step 5).
+# Containerized cloudflared needs the UUID here, not the tunnel name,
+# because no origin certificate exists inside the container.
+tunnel: 00000000-0000-0000-0000-000000000000
 credentials-file: /etc/cloudflared/credentials.json
 
 ingress:

@@ -19,40 +19,32 @@ at `C:\Users\jonah\.claude\plans\i-want-to-move-floating-tower.md` — read
 that for the complete picture if this file is insufficient. See
 `SETUP.md` for the current step-by-step provisioning runbook.
 
-## Current status (as of 2026-09-03)
+## Current status (as of 2026-09-17)
 
-Scaffolded locally, **not yet committed**, **no GitHub remote created**,
-**nothing deployed to the mini PC yet**. Jonah is reviewing the code
-before committing. DigitalOcean droplet (`DO_infra`) is still live and
-serving `farsi-transcriber.jonahsaidian.com` — do not touch/destroy it
-until the home server is verified working and DNS has been cut over.
+Both repos are committed and pushed to GitHub (`main`). On the mini PC:
+`farsi-transcriber` + `cloudflared` are up and serving (transcriber verified
+working by Jonah); the Immich stack (sibling repo) is up at v3.2.2 with its
+library on the mounted external HDD (canary marker in place) and a fresh,
+empty database. Tailscale is up (outbound-only) for remote admin access.
+The DigitalOcean droplet (`DO_infra`) is still live and serving
+`farsi-transcriber.jonahsaidian.com` — do not touch/destroy it until the home
+server is verified working and DNS has been cut over.
 
-The original bootstrap plan (Cloudflare Tunnel + runner only) has been
-expanded after a further design pass: Tailscale for remote admin access,
-Syncthing for Obsidian vault sync, an external-drive mount shared by
-Immich/backups/Syncthing, and automated nightly Immich Postgres backups.
-`bootstrap.sh` does not yet implement all of this — `SETUP.md` is the
-target design and marks what's automated today vs. still manual/planned.
+Remaining work, in order:
+1. Jonah tests Immich (re-create the admin account, upload a photo, check
+   thumbnails) via the temporary SSH tunnel forward.
+2. Verify push-to-deploy works via the self-hosted runners (both repos) —
+   runners still need installing; manual registration for now.
+3. DNS cutover, together with Jonah: `cloudflared tunnel route dns` for both
+   hostnames (replacing the DO A-record with tunnel CNAMEs), enable the
+   `photos.jonahsaidian.com` ingress, and remove both temporary forward
+   containers.
+4. Monitor 24-48h, then `terraform destroy` in `DO_infra` and archive it.
 
-Remaining work, in order (mirrors the plan file's "Migration/cutover
-order", expanded per `SETUP.md`):
-1. Jonah reviews and commits this repo + `immich-infra`, pushes to GitHub.
-2. Consolidate `bootstrap.sh` into the full `setup.sh` described in
-   `SETUP.md` (Docker + `sg docker` group-race fix, `ufw` incl.
-   `tailscale0`, shared `edge` network, external-drive mount via
-   UUID/fstab, Tailscale install/up, Syncthing install + GUI password,
-   systemd Immich-backup timer, GitHub Actions runner auto-registration
-   via PAT). Not yet implemented.
-3. Run `setup.sh` on the mini PC.
-4. Create the Cloudflare Tunnel, fill in `cloudflared/config.yml` and
-   `credentials.json` (gitignored, not in this repo).
-5. Bring up `farsi-transcriber` + `cloudflared` here, verify at a staging
-   hostname before cutting live DNS.
-6. Bring up `immich-infra` (see that repo's CLAUDE.md/README).
-7. Verify push-to-deploy works via the self-hosted runners (both repos).
-8. `cloudflared tunnel route dns` for both hostnames — this is the actual
-   DNS cutover, replacing the DO A-record with a tunnel CNAME.
-9. Monitor 24-48h, then `terraform destroy` in `DO_infra` and archive it.
+Still planned / not yet implemented: full `setup.sh` consolidation (see
+`SETUP.md`), `systemd/immich.service` install, nightly Immich Postgres backup
+timer, second backup drive (immich-infra Phase 2), Syncthing vault.
+Jellyfin and the AI-agent stack remain theoretical.
 
 ## Key decisions and why
 
