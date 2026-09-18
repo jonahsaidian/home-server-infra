@@ -40,23 +40,19 @@ Status legend:
    directory (`~/home-server-infra`, `~/immich-infra`) -- matches the
    `../immich-infra` relative-path convention already used in
    `CLAUDE.md`. No renaming.
-4. Create the master `.env` at `~/home-server-infra/.env`. This holds
-   secrets the **host itself** needs, not any one service:
-   - `GITHUB_PAT` -- used by `setup.sh` to mint a fresh, short-lived
-     GitHub Actions runner registration token at run time (registration
-     tokens expire in ~1 hour, so they can't be pre-supplied).
-   - `TAILSCALE_AUTHKEY` -- for non-interactive `tailscale up`.
-   - `OPENAI_API_KEY` -- **leave this blank.** `farsi-transcriber` is a
-     public app whose UI pre-fills this field from the environment for
-     every visitor (`ui/app.py`'s "Auto API Key" convenience feature) --
-     setting a real key here would let anyone hitting the public URL
-     transcribe on your account, charged to you. Leaving it unset forces
-     each visitor to paste in their own key, which is the intended
-     public-deployment mode.
-   Copy it from your local machine with `scp`, or create it directly on
-   the server -- either way this is a manual, one-time step.
+4. No master `.env` -- deliberately. This repo keeps no server-wide env
+   file:
+   - `farsi-transcriber` needs no `OPENAI_API_KEY`: each visitor pastes
+     their own key into the app's UI (verified in
+     `~/farsi-transcriber/ui/app.py` -- the env var is only an optional
+     auto-fill, empty by default), so usage is never charged to Jonah.
+   - Tailscale is already up on this host (done manually). A future
+     from-scratch `setup.sh` will take the auth key as an argument or
+     prompt, not from a file.
+   - Runner registration is manual for now; PAT-based auto-registration
+     remains a `setup.sh` TODO, also without a master `.env`.
 5. Create `immich-infra`'s own `.env` there (`JWT_SECRET`, `DB_PASSWORD`,
-   etc.) -- separate from the master `.env` above. See that repo's docs.
+   etc.). See that repo's docs.
 
 ## 3. Storage discovery (manual, 1 minute)
 
@@ -90,8 +86,9 @@ Runs once, non-interactively, and is expected to handle:
   remounts automatically on reboot. Shared by Immich's media library, the
   Postgres backup script, and the Syncthing vault.
 - **Tailscale (planned)** -- installs Tailscale, brings it up
-  non-interactively using `TAILSCALE_AUTHKEY` from the master `.env`, and
-  enables Tailscale SSH.
+  non-interactively using a `TAILSCALE_AUTHKEY` passed as an argument (no
+  master `.env`), and enables Tailscale SSH. Already done manually on
+  this host.
 - **Syncthing + Obsidian vault (planned)** -- installs Syncthing, does a
   temporary initial launch to generate its config XML, sets a GUI
   username/password (required -- the GUI is a web admin panel, separate
@@ -103,8 +100,9 @@ Runs once, non-interactively, and is expected to handle:
   (see below). AI-agent systemd triggers are out of scope until that
   stack gets its own design pass (see `CLAUDE.md`).
 - **GitHub Actions runner (planned)** -- calls the GitHub API with
-  `GITHUB_PAT` from the master `.env` to mint a fresh runner registration
-  token, registers the runner for this repo, and installs it as a
+  a `GITHUB_PAT` passed as an argument (no master `.env`) to mint a fresh
+  runner registration token, registers the runner for this repo, and
+  installs it as a
   service (`./svc.sh install && ./svc.sh start`) so it survives reboots.
   Repeat separately for `immich-infra` (its own runner, registered the
   same way from that repo).
@@ -184,9 +182,9 @@ Never exposed via Cloudflare Tunnel.
 
 **Disaster recovery.** If the mini PC fails entirely: get a replacement,
 run `setup.sh` again with the same (or a new) drive, restore the latest
-Immich Postgres dump, and re-supply the master `.env` and
-`immich-infra`'s `.env` from wherever they're kept safe (e.g. a password
-manager) -- neither is recoverable from the drive itself.
+Immich Postgres dump, and re-supply `immich-infra`'s `.env` from wherever
+it's kept safe (e.g. a password manager) -- it isn't recoverable from the
+drive itself. (This repo keeps no master `.env`.)
 
 ## Planned, not yet designed
 

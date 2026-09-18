@@ -68,7 +68,7 @@ mini PC) pulls the change and runs `docker compose up -d`. No inbound
 access is required to trigger a deploy -- the runner polls GitHub
 outbound. See `.github/workflows/deploy.yml`.
 
-Secrets (`.env`, `cloudflared/config.yml`, `cloudflared/credentials.json`)
+Secrets (`cloudflared/config.yml`, `cloudflared/credentials.json`)
 are gitignored and live only in the runner's working copy on the server --
 place them there once during setup, they persist across deploys.
 

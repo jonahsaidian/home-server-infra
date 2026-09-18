@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Don't git-clean: .env, cloudflared/config.yml, and
+          # Don't git-clean: cloudflared/config.yml and
           # cloudflared/credentials.json are gitignored and live only in
           # this runner's working copy (placed there once during setup).
           clean: false

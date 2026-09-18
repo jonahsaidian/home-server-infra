@@ -12,16 +12,12 @@ services:
 
   farsi-transcriber:
     image: ghcr.io/jonahsaidian/farsitotext:latest
-    env_file:
-      - .env
     expose:
       - "8501"
     restart: unless-stopped
 
   # app2:
   #   image: ghcr.io/jonahsaidian/app2:latest
-  #   env_file:
-  #     - .env
   #   expose:
   #     - "8502"
   #   restart: unless-stopped

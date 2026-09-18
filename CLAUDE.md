@@ -73,7 +73,7 @@ order", expanded per `SETUP.md`):
   externally-reachable service to it. Everything else (postgres, redis,
   machine-learning) stays off `edge` entirely.
 - **`clean: false` on `actions/checkout` in the deploy workflow.**
-  `.env`, `cloudflared/config.yml`, and `cloudflared/credentials.json` are
+  `cloudflared/config.yml` and `cloudflared/credentials.json` are
   gitignored secrets that must be placed manually, once, in the
   self-hosted runner's working copy on the server. Default
   `actions/checkout` behavior (`git clean -ffdx`) would wipe them on every
@@ -102,17 +102,19 @@ order", expanded per `SETUP.md`):
   it to `0.0.0.0` with no auth would let anything that can reach the port
   reconfigure Syncthing (add devices, change shared folders). Never
   exposed via Cloudflare Tunnel.
-- **Master `.env` for server-wide secrets, per-service `.env` for the
-  rest.** The root `.env` in this repo holds things the host itself needs
-  (GitHub PAT for runner registration, Tailscale auth key). `immich-infra`
-  keeps its own `.env` (`JWT_SECRET`, `DB_PASSWORD`, etc.) — each
-  service's secrets stay with that service's repo/compose project.
+- **No master `.env` — deliberate.** `farsi-transcriber` needs no
+  server-side secrets: each visitor pastes their own OpenAI key into the
+  app UI (the `OPENAI_API_KEY` env var is only an optional auto-fill,
+  empty by default — verified in the app source). `immich-infra` keeps
+  its own `.env` (`JWT_SECRET`, `DB_PASSWORD`, etc.). Tailscale came up
+  manually and runner registration is manual for now, so nothing needs a
+  server-wide env file.
 - **GitHub Actions runner registration is automated via a PAT, not a
   pasted one-time token.** Runner registration tokens expire in about an
-  hour, so they can't be pre-supplied for a non-interactive `setup.sh`
-  the way other secrets can. Instead a GitHub PAT lives in the master
-  `.env` and `setup.sh` calls the GitHub API to mint a fresh registration
-  token at run time.
+  hour, so they can't be pre-supplied for a non-interactive `setup.sh`.
+  `setup.sh` will take a GitHub PAT as an argument (no master `.env`) and
+  call the GitHub API to mint a fresh registration token at run time.
+  Manual registration until then.
 - **External drive mounted at the host level, in this repo, not inside
   `immich-infra`.** The mount (via UUID in `/etc/fstab`) is generic infra
   that multiple things depend on — Immich's media library, the Postgres

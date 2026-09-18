@@ -49,8 +49,8 @@ cat <<'EOF'
      cloudflared tunnel route dns home-server farsi-transcriber.jonahsaidian.com
      cloudflared tunnel route dns home-server photos.jonahsaidian.com
 
-4. Master .env (OPENAI_API_KEY, GITHUB_PAT, TAILSCALE_AUTHKEY) should
-   already exist at this point -- see SETUP.md step 2.
+4. No master .env -- this repo deliberately keeps no server-wide env file
+   (see SETUP.md step 2).
 
 5. Install a GitHub Actions self-hosted runner for this repo:
      https://github.com/<your-username>/home-server-infra/settings/actions/runners/new
