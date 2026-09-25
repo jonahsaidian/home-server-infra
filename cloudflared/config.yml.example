@@ -10,4 +10,8 @@ ingress:
     service: http://farsi-transcriber:8501
   - hostname: photos.jonahsaidian.com
     service: http://immich-server:2283
+  # Static Immich-mimic demo page (~/immich-demo served by the immich-demo
+  # nginx service in docker-compose.yml). No backend.
+  - hostname: server.jonahsaidian.com
+    service: http://immich-demo:80
   - service: http_status:404

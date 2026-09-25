@@ -16,6 +16,14 @@ services:
       - "8501"
     restart: unless-stopped
 
+  immich-demo:
+    image: nginx:alpine
+    volumes:
+      - /home/jonah/immich-demo:/usr/share/nginx/html:ro
+    expose:
+      - "80"
+    restart: unless-stopped
+
   # app2:
   #   image: ghcr.io/jonahsaidian/app2:latest
   #   expose:
